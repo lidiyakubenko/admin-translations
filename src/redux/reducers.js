@@ -1,4 +1,4 @@
-import t from '../actions/actionTypes';
+import t from '../redux/actionTypes';
 
 const project = (state = {}, action) => {
   switch (action.type) {
@@ -17,6 +17,24 @@ const project = (state = {}, action) => {
             [key]: translation,
           },
         },
+      };
+    }
+    case t.ADD_KEY_TRANSLATION: {
+      const { translations } = state;
+      const { key } = action;
+      const locales = Object.keys(translations);
+
+      const newDate = locales.reduce(
+        (accum, locale) => ({
+          ...accum,
+          [locale]: { ...translations[locale], [key]: '' },
+        }),
+        {},
+      );
+
+      return {
+        ...state,
+        translations: newDate,
       };
     }
     default:
@@ -38,6 +56,10 @@ const projects = (state = [], action) => {
         isSelected: false,
       }));
     case t.UPDATE_TRANSLATION:
+      return state.map((item) =>
+        item._id === action._id ? project(item, action) : item,
+      );
+    case t.ADD_KEY_TRANSLATION:
       return state.map((item) =>
         item._id === action._id ? project(item, action) : item,
       );

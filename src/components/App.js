@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import { setProject, setProjects } from '../actions/projects';
-import { fetchProject, fetchAllProjectNames } from '../api/projects';
+import { setProject, setProjects } from '../redux/actions';
+import { fetchProject, fetchAllProjectNames } from '../api';
 import Translations from './Translations';
 import Menu from './Menu';
 

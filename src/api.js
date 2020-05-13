@@ -11,7 +11,12 @@ const fetchProject = (_id) =>
 
 const addTranslation = ({ _id, key, locale, translation }) =>
   axios.post(`/addTranslation/${_id}/${locale}/${key}`, {
-    translation: translation,
+    value: translation,
   });
 
-export { fetchProject, fetchAllProjectNames, addTranslation };
+const addKeyTranslation = ({ _id, key }) =>
+  axios.post(`/addKeyTranslation/${_id}`, {
+    value: key,
+  });
+
+export { fetchProject, fetchAllProjectNames, addTranslation, addKeyTranslation };

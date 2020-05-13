@@ -1,8 +1,8 @@
 import React from 'react';
 import MaterialTable from 'material-table';
 import { connect } from 'react-redux';
-import { addTranslation } from '../api/projects';
-import { updateTransl } from '../actions/translations';
+import { addKeyTranslation, addTranslation } from '../api';
+import { addKeyTransl, updateTransl } from '../redux/actions';
 
 const adaptColumns = (project) => {
   const { translations } = project;
@@ -14,7 +14,7 @@ const adaptColumns = (project) => {
         fontWeight: 'bold',
         fontSize: '16px',
       },
-      editable: 'never',
+      editable: 'onAdd',
     },
   ];
   const locales = Object.keys(translations);
@@ -43,7 +43,7 @@ const adaptData = (project) => {
   });
 };
 
-const Translations = ({ project, updateTransl }) => {
+const Translations = ({ project, updateTransl, addKeyTransl }) => {
   React.useEffect(() => {
     if (project.translations) {
       const columns = adaptColumns(project);
@@ -59,6 +59,26 @@ const Translations = ({ project, updateTransl }) => {
       locale,
       translation,
     });
+
+  const addNewRow = async ({ resolve, newData }) => {
+    const { _id } = project;
+    const { key, ...fields } = newData;
+    const locales = Object.keys(fields);
+
+    const result = await addKeyTranslation({ _id, key });
+
+    if (result.data.code === 'success') {
+      addKeyTransl({ key, _id });
+
+      if (locales.length !== 0) {
+        const oldData = locales.reduce(
+          (accum, locale) => ({ ...accum, [locale]: '' }),
+          {},
+        );
+        updateTranslations({ resolve, oldData, newData });
+      }
+    }
+  };
 
   const updateTranslations = ({ resolve, oldData, newData }) => {
     const { key, ...fields } = newData;
@@ -112,14 +132,7 @@ const Translations = ({ project, updateTransl }) => {
       editable={{
         onRowAdd: (newData) =>
           new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                data.push(newData);
-                return { ...prevState, data };
-              });
-            }, 600);
+            addNewRow({ resolve, newData });
           }),
         onRowUpdate: (newData, oldData) =>
           new Promise((resolve) => {
@@ -146,6 +159,9 @@ const Translations = ({ project, updateTransl }) => {
 const mapDispatchToProps = (dispatch) => ({
   updateTransl: (data) => {
     dispatch(updateTransl(data));
+  },
+  addKeyTransl: (data) => {
+    dispatch(addKeyTransl(data));
   },
 });
 

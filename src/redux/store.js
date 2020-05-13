@@ -1,6 +1,6 @@
 import { combineReducers, createStore } from 'redux';
 
-import projects from '../reducers/projects';
+import projects from './reducers';
 
 const app = combineReducers({
   projects,
