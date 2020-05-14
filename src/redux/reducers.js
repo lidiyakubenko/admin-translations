@@ -37,6 +37,29 @@ const project = (state = {}, action) => {
         translations: newDate,
       };
     }
+
+    case t.DELETE_KEY_TRANSLATION: {
+      const { translations } = state;
+      const { key } = action;
+      const locales = Object.keys(translations);
+
+      const newDate = locales.reduce((accum, locale) => {
+        const {
+          [key]: {},
+          ...rest
+        } = translations[locale];
+
+        return {
+          ...accum,
+          [locale]: rest,
+        };
+      }, {});
+
+      return {
+        ...state,
+        translations: newDate,
+      };
+    }
     default:
       return state;
   }
@@ -60,6 +83,10 @@ const projects = (state = [], action) => {
         item._id === action._id ? project(item, action) : item,
       );
     case t.ADD_KEY_TRANSLATION:
+      return state.map((item) =>
+        item._id === action._id ? project(item, action) : item,
+      );
+    case t.DELETE_KEY_TRANSLATION:
       return state.map((item) =>
         item._id === action._id ? project(item, action) : item,
       );

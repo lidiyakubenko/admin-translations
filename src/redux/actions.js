@@ -17,4 +17,10 @@ const addKeyTransl = ({ key, _id }) => ({
   key,
 });
 
-export { setProject, setProjects, updateTransl, addKeyTransl };
+const deleteKeyTransl = ({ key, _id }) => ({
+  type: t.DELETE_KEY_TRANSLATION,
+  _id,
+  key,
+});
+
+export { setProject, setProjects, updateTransl, addKeyTransl, deleteKeyTransl };

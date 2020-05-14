@@ -1,8 +1,12 @@
 import React from 'react';
 import MaterialTable from 'material-table';
 import { connect } from 'react-redux';
-import { addKeyTranslation, addTranslation } from '../api';
-import { addKeyTransl, updateTransl } from '../redux/actions';
+import {
+  addKeyTranslation,
+  addTranslation,
+  deleteKeyTranslation,
+} from '../api';
+import { addKeyTransl, deleteKeyTransl, updateTransl } from '../redux/actions';
 
 const adaptColumns = (project) => {
   const { translations } = project;
@@ -43,7 +47,17 @@ const adaptData = (project) => {
   });
 };
 
-const Translations = ({ project, updateTransl, addKeyTransl }) => {
+const Translations = ({
+  project,
+  updateTransl,
+  addKeyTransl,
+  deleteKeyTransl,
+}) => {
+  const [state, setState] = React.useState({
+    columns: [],
+    data: [],
+  });
+
   React.useEffect(() => {
     if (project.translations) {
       const columns = adaptColumns(project);
@@ -51,14 +65,6 @@ const Translations = ({ project, updateTransl, addKeyTransl }) => {
       setState({ columns, data });
     }
   }, [project]);
-
-  const updateTranslation = ({ key, locale, translation }) =>
-    addTranslation({
-      _id: project._id,
-      key,
-      locale,
-      translation,
-    });
 
   const addNewRow = async ({ resolve, newData }) => {
     const { _id } = project;
@@ -75,12 +81,20 @@ const Translations = ({ project, updateTransl, addKeyTransl }) => {
           (accum, locale) => ({ ...accum, [locale]: '' }),
           {},
         );
-        updateTranslations({ resolve, oldData, newData });
+        updateRows({ resolve, oldData, newData });
       }
     }
   };
 
-  const updateTranslations = ({ resolve, oldData, newData }) => {
+  const updateTranslation = ({ key, locale, translation }) =>
+    addTranslation({
+      _id: project._id,
+      key,
+      locale,
+      translation,
+    });
+
+  const updateRows = ({ resolve, oldData, newData }) => {
     const { key, ...fields } = newData;
     const locales = Object.keys(fields);
 
@@ -113,10 +127,17 @@ const Translations = ({ project, updateTransl, addKeyTransl }) => {
     });
   };
 
-  const [state, setState] = React.useState({
-    columns: [],
-    data: [],
-  });
+  const deleteRow = async ({ resolve, oldData }) => {
+    const { _id } = project;
+    const { key } = oldData;
+
+    const result = await deleteKeyTranslation({ _id, key });
+    resolve();
+
+    if (result.data.code === 'success') {
+      deleteKeyTransl({ key, _id });
+    }
+  };
 
   return (
     <MaterialTable
@@ -124,6 +145,7 @@ const Translations = ({ project, updateTransl, addKeyTransl }) => {
       columns={state.columns}
       data={state.data}
       options={{
+        pageSize: 10,
         headerStyle: {
           backgroundColor: '#9966ff',
           color: '#FFF',
@@ -137,19 +159,12 @@ const Translations = ({ project, updateTransl, addKeyTransl }) => {
         onRowUpdate: (newData, oldData) =>
           new Promise((resolve) => {
             if (oldData) {
-              updateTranslations({ resolve, oldData, newData });
+              updateRows({ resolve, oldData, newData });
             }
           }),
         onRowDelete: (oldData) =>
           new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                data.splice(data.indexOf(oldData), 1);
-                return { ...prevState, data };
-              });
-            }, 600);
+            deleteRow({ resolve, oldData });
           }),
       }}
     />
@@ -162,6 +177,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   addKeyTransl: (data) => {
     dispatch(addKeyTransl(data));
+  },
+  deleteKeyTransl: (data) => {
+    dispatch(deleteKeyTransl(data));
   },
 });
 

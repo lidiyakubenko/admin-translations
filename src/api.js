@@ -19,4 +19,7 @@ const addKeyTranslation = ({ _id, key }) =>
     value: key,
   });
 
-export { fetchProject, fetchAllProjectNames, addTranslation, addKeyTranslation };
+const deleteKeyTranslation = ({ _id, key }) =>
+  axios.delete(`/deleteKeyTranslation/${_id}/${key}`);
+
+export { fetchProject, fetchAllProjectNames, addTranslation, addKeyTranslation, deleteKeyTranslation };
