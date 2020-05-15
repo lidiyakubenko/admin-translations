@@ -67,12 +67,23 @@ const project = (state = {}, action) => {
 
 const projects = (state = [], action) => {
   switch (action.type) {
+    case t.ADD_NEW_PROJECT:
+      return [
+        ...state.map((item) => ({
+          ...item,
+          isSelected: false,
+        })),
+        { ...action.data, isSelected: true },
+      ];
+
     case t.SET_PROJECT:
       return state.map((item) =>
         item._id === action.data._id
           ? project(item, action)
           : { ...item, isSelected: false },
       );
+    case t.DELETE_PROJECT:
+      return state.filter((item) => item._id !== action._id);
     case t.SET_PROJECTS:
       return [...state, ...action.data].map((item) => ({
         ...item,

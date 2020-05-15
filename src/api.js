@@ -3,6 +3,14 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
+const addProject = (name) =>
+  axios.post('/addProject', {
+    value: name,
+  });
+
+const deleteProject = (_id) =>
+  axios.delete(`/deleteProject/${_id}`);
+
 const fetchAllProjectNames = () =>
   axios.get('/getAllProjectNames').then(({ data }) => data.data);
 
@@ -22,4 +30,12 @@ const addKeyTranslation = ({ _id, key }) =>
 const deleteKeyTranslation = ({ _id, key }) =>
   axios.delete(`/deleteKeyTranslation/${_id}/${key}`);
 
-export { fetchProject, fetchAllProjectNames, addTranslation, addKeyTranslation, deleteKeyTranslation };
+export {
+  addProject,
+  fetchProject,
+  deleteProject,
+  addTranslation,
+  addKeyTranslation,
+  fetchAllProjectNames,
+  deleteKeyTranslation,
+};
