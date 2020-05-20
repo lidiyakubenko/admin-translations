@@ -43,6 +43,7 @@ module.exports = (env, argv) => {
     config.devServer = {
       contentBase: './dist',
       hot: true,
+      port: 3000
     };
     config.plugins = [
       ...config.plugins,
